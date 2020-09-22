@@ -7,13 +7,16 @@ int main() {
     int t;
     cin >> t;
     while(t--){
-        int length, temp;
-        set<int> data;
-        map<int,int> mp;
-        int repeat_most = 0;
+        long long length, temp;
+        set<long long> data;
+        map<long long,long long> mp;
+        long long repeat_most = 0;
         
         cin >> length;
         if(length < 2){
+            for(int i = 0;i < length;i++){
+                cin >> temp;
+            }
             cout << 0 << endl;
             continue;
         }
@@ -27,12 +30,19 @@ int main() {
                 repeat_most = a.second;
         }
         
-        int distinct_most = data.size();
+        long long distinct_most = data.size();
+        distinct_most--;
 
         if(repeat_most <= distinct_most)
             cout << repeat_most << endl;
+        else if(repeat_most - distinct_most >= 2)
+            cout << distinct_most + 1 << endl;
         else
             cout << distinct_most << endl;
+
+        data.clear();
+        mp.clear();
+
     }
     return 0;
 }
