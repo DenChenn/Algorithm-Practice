@@ -1,2 +1,2 @@
 # Algorithm-Practice
-This is my practice of algorithm class
+This is my practice of algorithm class.
