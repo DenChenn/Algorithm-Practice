@@ -10,6 +10,7 @@ int main () {
     cin >> t;
     while(t--){
         fill_n(a1, 100001, 0);
+        vector<int> ensure, leave;
 
         int l1, l2, temp;
         unordered_map<int,int> mp;
@@ -21,10 +22,10 @@ int main () {
         }
         for(int i = 0;i < l2;i++){
             cin >> temp;
+            ensure.push_back(temp);
             mp[temp] = 0;
         }
 
-        vector<int> leave, rev;
         for(int i = 0;i < l1;i++){
             if(mp.count(a1[i]))
                 mp[a1[i]]++;
@@ -34,12 +35,10 @@ int main () {
         sort(leave.begin(),leave.end());
 
 
-        for(auto a : mp){
-            for(int i = 0;i < a.second;i++)
-                rev.push_back(a.first);
+        for(int i = 0;i < ensure.size();i++){
+            for(int j = 0;j < mp[ensure[i]];j++)
+                cout << ensure[i] << " ";
         }
-        for(int i = rev.size() - 1;i >= 0;i--)
-            cout << rev[i] << " ";
         
         if(leave.size() != 0){
             for(int i = 0;i < leave.size();i++)
@@ -52,7 +51,7 @@ int main () {
 
         mp.clear();
         leave.clear();
-        rev.clear();
+        ensure.clear();
     }
     return 0;
 }
