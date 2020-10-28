@@ -6,15 +6,15 @@
 using namespace std;
 
 struct Store{
-    int x;
-    int y;
+    long long x;
+    long long y;
     double dis;
-    int order;
+    long long order;
 };
 
 struct Two{
-    int first;
-    int second;
+    long long first;
+    long long second;
     double dis;
 };
 
@@ -22,7 +22,7 @@ const Store Max = {40001, 40001, 0.0, -1};
 const Two gg = {40001, 40001, 70000};
 vector<Store> m;
 vector<Two> record;
-bool del[40001];
+bool del[264143];
 int ans = 0;
 
 int lb(int l, int x, int left){
@@ -35,29 +35,9 @@ int lb(int l, int x, int left){
         return -1;
 
     while(L + 1 != R){
-        int mid = (L + R) / 2;
+        int mid = L + (R - L)/2;
 
         if(x <= m[mid].x)
-            R = mid;
-        else
-            L = mid;
-    }
-    return R;
-}
-
-int lbX(int l, double x, int left){
-    int L = left;
-    int R = l - 1;
-
-    if(record[L].dis > x)
-        return L;
-    if(record[R].dis < x)
-        return -1;
-
-    while(L + 1 != R){
-        int mid = (L + R) / 2;
-
-        if(x <= record[mid].dis)
             R = mid;
         else
             L = mid;
@@ -105,7 +85,6 @@ void MergeSort(int front, int end){
 }
 
 void MergeX(std::vector<Two> &Array, int front, int mid, int end){
-
     std::vector<Two> LeftSub(Array.begin()+front, Array.begin()+mid+1),
                      RightSub(Array.begin()+mid+1, Array.begin()+end+1);
 
@@ -116,11 +95,77 @@ void MergeX(std::vector<Two> &Array, int front, int mid, int end){
 
     for (int i = front; i <= end; i++) {
 
-        if (LeftSub[idxLeft].dis <= RightSub[idxRight].dis ) {
+        if (LeftSub[idxLeft].dis < RightSub[idxRight].dis) {
+            //cout << "i: " << i << " " << 1 << endl;
+            if(m[LeftSub[idxLeft].first].dis > m[LeftSub[idxLeft].second].dis){
+                int t = LeftSub[idxLeft].first;
+                LeftSub[idxLeft].first = LeftSub[idxLeft].second;
+                LeftSub[idxLeft].second = t;
+            }
+            else if (m[LeftSub[idxLeft].first].dis == m[LeftSub[idxLeft].second].dis && 
+                    m[LeftSub[idxLeft].second].order < m[LeftSub[idxLeft].first].order){   
+                int t = LeftSub[idxLeft].first;
+                LeftSub[idxLeft].first = LeftSub[idxLeft].second;
+                LeftSub[idxLeft].second = t;
+            }
             Array[i] = LeftSub[idxLeft];
             idxLeft++;
         }
+        else if (LeftSub[idxLeft].dis == RightSub[idxRight].dis){
+            //cout << "i: " << i << " " << 2 << endl;
+            vector<int> temp;
+            temp.push_back(LeftSub[idxLeft].first);
+            temp.push_back(LeftSub[idxLeft].second);
+            temp.push_back(RightSub[idxRight].first);
+            temp.push_back(RightSub[idxRight].second);
+            int min = 0;
+            for(int i = 1;i < 4;i++){
+                if(m[temp[min]].dis > m[temp[i]].dis)
+                    min = i;
+            }
+            if(min == 0 || min == 1){
+                if(m[temp[0]].dis > m[temp[1]].dis){
+                    int t = LeftSub[idxLeft].first;
+                    LeftSub[idxLeft].first = LeftSub[idxLeft].second;
+                    LeftSub[idxLeft].second = t;
+                }
+                else if(m[temp[0]].dis == m[temp[1]].dis && m[temp[0]].order > m[temp[1]].order){
+                    int t = LeftSub[idxLeft].first;
+                    LeftSub[idxLeft].first = LeftSub[idxLeft].second;
+                    LeftSub[idxLeft].second = t;
+                }
+                Array[i] = LeftSub[idxLeft];
+                idxLeft++;
+            }
+            else{
+                if(m[temp[2]].dis > m[temp[3]].dis){
+                    int t = RightSub[idxLeft].first;
+                    RightSub[idxRight].first = RightSub[idxRight].second;
+                    RightSub[idxRight].second = t;
+                }
+                else if(m[temp[2]].dis == m[temp[3]].dis && m[temp[2]].order > m[temp[3]].order){
+                    int t = RightSub[idxRight].first;
+                    RightSub[idxRight].first = RightSub[idxRight].second;
+                    RightSub[idxRight].second = t;
+                }
+                Array[i] = RightSub[idxRight];
+                idxRight++;
+            }
+
+        }
         else{
+            //cout << "i: " << i << " " << 3 << endl;
+            if(m[RightSub[idxRight].first].dis > m[RightSub[idxRight].second].dis){
+                int t = RightSub[idxRight].first;
+                RightSub[idxRight].first = RightSub[idxRight].second;
+                RightSub[idxRight].second = t;
+            }
+            else if (m[RightSub[idxRight].first].dis == m[RightSub[idxRight].second].dis && 
+                    m[RightSub[idxRight].second].order < m[RightSub[idxRight].first].order){
+                int t = RightSub[idxRight].first;
+                RightSub[idxRight].first = RightSub[idxRight].second;
+                RightSub[idxRight].second = t;
+            }
             Array[i] = RightSub[idxRight];
             idxRight++;
         }
@@ -142,13 +187,13 @@ void find(){
     int last;
     double dis;
 
-    for(int i = 0;i < l;i++){
+    for(long long i = 0;i < l;i++){
         if(del[i])
             continue;
 
         last = lb(l, m[i].x + 200, i);
         if(last != -1){
-            for(int j = i+1;j < last;j++){
+            for(long long j = i+1;j < last;j++){
                 if(del[j])
                     continue;
                 if((m[j].x - m[i].x)*(m[j].x - m[i].x) + (m[j].y - m[i].y)*(m[j].y - m[i].y) < 40000){
@@ -160,7 +205,7 @@ void find(){
         }
         else{
             vector<int> temp;
-            for(int j = i+1;j < m.size();j++){
+            for(long long j = i+1;j < m.size();j++){
                 if(del[j])
                     continue;
                 if((m[j].x - m[i].x)*(m[j].x - m[i].x) + (m[j].y - m[i].y)*(m[j].y - m[i].y) < 40000){
@@ -180,7 +225,7 @@ int main () {
     cin >> num;
     memset(del, false, 40001);
 
-    for(int i = 0;i < num;i++){
+    for(long long i = 0;i < num;i++){
         cin >> a >> b;
         dis = sqrt((20000 - a)*(20000 - a) + (20000 - b)*(20000 - b));
         Store temp = {a, b, dis, i};
@@ -190,91 +235,19 @@ int main () {
     MergeSort(0, num-1);
     find();
     MergeSortX(record, 0, record.size()-1);
-
-    set<int> del;
     int index = 0;
     
-    while(index < record.size()){
-        int have_del = 0;
-        if(del.count(record[index].first) == 1 || del.count(record[index].second) == 1){
-            //cout << "index: " << index << endl;
-            index++;
+    int del[264143];
+    fill_n(del, 264143, false);
+
+    for(long long i = 0;i < record.size();i++){
+        if(del[record[i].first] || del[record[i].second])
             continue;
-        }
-        //cout << "inin" << endl;
-
-        int bound = lbX(record.size(), record[index].dis+0.1, index+1);
-        //cout << "bound " << bound << endl;
-        if(bound == index + 1 || bound == -1){
-            if(m[record[index].first].dis < m[record[index].second].dis){
-                //cout << "1" << endl;
-                del.insert(record[index].first);
-                ans++;
-                have_del = 1;
-            }
-            else if(m[record[index].first].dis > m[record[index].second].dis){
-                //cout << "2" << endl;
-                del.insert(record[index].second);
-                ans++;
-                have_del = 1;
-            }
-            else{
-                if(m[record[index].first].order < m[record[index].second].order){
-                    //cout << "3" << endl;
-                    del.insert(record[index].first);
-                    ans++;
-                    have_del = 1;
-                }
-                else{
-                    //cout << "4" << endl;
-                    del.insert(record[index].second);
-                    ans++;
-                    have_del = 1;
-                }
-            }
-        }
+        
         else{
-            int tar_index = index;
-            int tar_dis = m[record[index].first].dis;
-
-            for(int i = index+1;i < bound;i++){
-                //cout << "i: " << i << endl; 
-                if(del.count(record[i].first) == 1 || del.count(record[i].second) == 1)
-                    continue;
-                
-                if(tar_dis > m[record[i].first].dis){
-                    //cout << "6" << endl;
-                    tar_index = record[i].first;
-                }
-                else if(tar_dis == m[record[i].first].dis){
-                    if(m[tar_index].order > m[record[i].first].order){
-                        //cout << "7" << endl;
-                        tar_index = record[i].first;
-                        tar_dis = m[record[i].first].dis;
-
-                    }
-                }
-                if(tar_dis > m[record[i].second].dis){
-                    //cout << "8" << endl;
-                    tar_index = record[i].second;
-                }
-                else if(tar_dis == m[record[i].second].dis){
-                    if(m[tar_index].order > m[record[i].second].order){
-                        //cout << "6" << endl;
-                        tar_index = record[i].second;
-                        tar_dis = m[record[i].second].dis;
-
-                    }
-                }
-            }
-            have_del = 1;
-            del.insert(tar_index);
             ans++;
-            
-        }
-        if(have_del == 0){
-            cout << "break" << endl;
-            break;
+            del[record[i].first] = true;
+            continue;
         }
     }
 

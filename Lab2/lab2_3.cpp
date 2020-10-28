@@ -1,145 +1,80 @@
-#include<iostream>
-#include<cstring>
+#include<bits/stdc++.h>
 using namespace std;
 
-struct P {
-	P(int a, int b, int c, int d): x(a), y(b), px(c), py(d){}
-	int x;
-	int y;
-	int px;
-	int py;
-};
+int row, col, ans;
+char m[65][65];
+bool visited[65][65];
 
-int m[65][65];
-
-void clone(bool a[][65], bool b[][65], int row, int col){
-	for(int i = 0;i < row;i++){
-		for(int j = 0;j < col;j++)
-			a[j][i] = b[j][i];
-	}
-}
-
-void solve(int m[][65], P pos, int& ans, int row, int col, bool rem[][65]){
-	if(pos.x == col - 1 && pos.y == row - 1){
+void solve(int x, int y, bool is_hori){
+	//cout << x << " " << y << endl;
+	if(x == col-1 && y == row-1){ 
+		if(m[x][y] == 'B')
+			return;
+		//cout << "yaya" << endl;
 		ans++;
 		return;
 	}
+	
 
-	if(pos.x - pos.px == 1){
-		if(!rem[pos.x+1][pos.y] && m[pos.x][pos.y] == 'L' && pos.x+1 < col && m[pos.x+1][pos.y] != 'B'){
-			bool con[65][65];
-			clone(con, rem, row, col);
-			con[pos.x+1][pos.y] = true;
-			solve(m, P(pos.x+1, pos.y, pos.x, pos.y), ans, row, col, con);
-		}
+	if(x < 0 || x >= col || y < 0 || y >= row || visited[x][y])
+		return;
+	
+	visited[x][y] = true;
 		
-		if(!rem[pos.x][pos.y+1] && m[pos.x][pos.y] == 'T' && pos.y + 1 < row && m[pos.x][pos.y+1] != 'B'){
-			bool con[65][65];
-			clone(con, rem, row, col);
-			con[pos.x][pos.y+1] = true;
-			solve(m, P(pos.x, pos.y+1, pos.x, pos.y), ans, row, col, con);
+	if(m[x][y] == 'B')
+		return;	
+	else if(m[x][y] == 'L'){ 
+		if(is_hori){
+			//cout << "1" << endl;
+			solve(x+1, y, true);
+			solve(x-1, y, true);
 		}
-
-		if(!rem[pos.x][pos.y-1] && m[pos.x][pos.y] == 'T' && pos.y - 1 >= 0 && m[pos.x][pos.y+1] != 'B'){
-			bool con[65][65];
-			clone(con, rem, row, col);
-			con[pos.x][pos.y-1] = true;
-			solve(m, P(pos.x, pos.y-1, pos.x, pos.y), ans, row, col, con);
-		}
-	}
-
-	if(pos.x - pos.px == -1){
-		if(!rem[pos.x-1][pos.y] && m[pos.x][pos.y] == 'L' && pos.x-1 >=0 && m[pos.x-1][pos.y] != 'B'){
-			bool con[65][65];
-			clone(con, rem, row, col);
-			con[pos.x-1][pos.y] = true;
-			solve(m, P(pos.x-1, pos.y, pos.x, pos.y), ans, row, col, con);
-		}
-		if(!rem[pos.x][pos.y+1] && m[pos.x][pos.y] == 'T' && pos.y + 1 < row && m[pos.x][pos.y+1] != 'B'){
-			bool con[65][65];
-			clone(con, rem, row, col);
-			con[pos.x][pos.y+1] = true;
-			solve(m, P(pos.x, pos.y+1, pos.x, pos.y), ans, row, col, con);
-		}
-
-		if(!rem[pos.x][pos.y-1] && m[pos.x][pos.y] == 'T' && pos.y - 1 >= 0 && m[pos.x][pos.y+1] != 'B'){
-			bool con[65][65];
-			clone(con, rem, row, col);
-			con[pos.x][pos.y-1] = true;
-			solve(m, P(pos.x, pos.y-1, pos.x, pos.y), ans, row, col, con);
+		else{
+			//cout << "2" << endl;
+			solve(x, y+1, false);
+			solve(x, y-1, false);
 		}
 	}
-
-	if(pos.y - pos.py == 1){
-		if(!rem[pos.x][pos.y+1] && m[pos.x][pos.y] == 'L' && pos.y+1 < row && m[pos.x][pos.y+1] != 'B'){
-			bool con[65][65];
-			clone(con, rem, row, col);
-			con[pos.x][pos.y+1] = true;
-			solve(m, P(pos.x, pos.y+1, pos.x, pos.y), ans, row, col, con);
+	else if(m[x][y] == 'T'){
+		if(is_hori){
+			//cout << "3" << endl;
+			solve(x, y+1, false);
+			solve(x, y-1, false);
 		}
-		if(!rem[pos.x+1][pos.y] && m[pos.x][pos.y] == 'T' && pos.x + 1 < col && m[pos.x+1][pos.y] != 'B'){
-			bool con[65][65];
-			clone(con, rem, row, col);
-			con[pos.x+1][pos.y] = true;
-			solve(m, P(pos.x+1, pos.y, pos.x, pos.y), ans, row, col, con);
-		}
-
-		if(!rem[pos.x-1][pos.y] && m[pos.x][pos.y] == 'T' && pos.x - 1 >= 0 && m[pos.x-1][pos.y] != 'B'){
-			bool con[65][65];
-			clone(con, rem, row, col);
-			con[pos.x-1][pos.y] = true;
-			solve(m, P(pos.x-1, pos.y, pos.x, pos.y), ans, row, col, con);
+		else{
+			//cout << "4" << endl;
+			solve(x+1, y, true);
+			solve(x-1, y, true);
 		}
 	}
-
-	if(pos.y - pos.py == -1){
-		if(!rem[pos.x][pos.y-1] && m[pos.x][pos.y] == 'L' && pos.y-1 >= 0 && m[pos.x][pos.y-1] != 'B'){
-			bool con[65][65];
-			clone(con, rem, row, col);
-			con[pos.x][pos.y-1] = true;
-			solve(m, P(pos.x, pos.y-1, pos.x, pos.y), ans, row, col, con);
-		}
-		
-		if(!rem[pos.x+1][pos.y] && m[pos.x][pos.y] == 'T' && pos.x + 1 < col && m[pos.x+1][pos.y] != 'B'){
-			bool con[65][65];
-			clone(con, rem, row, col);
-			con[pos.x+1][pos.y] = true;
-			solve(m, P(pos.x+1, pos.y, pos.x, pos.y), ans, row, col, con);
-		}
-
-		if(!rem[pos.x-1][pos.y] && m[pos.x][pos.y] == 'T' && pos.x - 1 >= 0 && m[pos.x-1][pos.y] != 'B'){
-			bool con[65][65];
-			clone(con, rem, row, col);
-			con[pos.x-1][pos.y] = true;
-			solve(m, P(pos.x-1, pos.y, pos.x, pos.y), ans, row, col, con);
-		}
-	}
+	 
+	visited[x][y] = false;
 	return;
 }
 
-int main () {
+int main(){
+	
 	int t;
-	int row, col;
-	char temp;
 	cin >> t;
+	
 	while(t--){
 		cin >> row >> col;
-		int ans = 0;
-		bool rec[65][65];
-		memset(rec, false, sizeof(rec));
-		rec[0][0] = true;
-		for(int i = 0;i < row;i++){
-			for(int j = 0;j < col;j++){
-				cin >> temp;
-				m[j][i] = temp;
-			}
-		}
-		P pos = {0, 0, -1, -1};
-	
+		
+		for(int i = 0; i < row; i++)
+			for(int j = 0; j < col; j++)
+				cin >> m[j][i];	
+		
+		ans = 0;
+		bool is_hori = true;
 
-		solve(m, pos, ans, row, col, rec);
+		memset(visited, false, sizeof(visited));
+		solve(0, 0, is_hori);
+		
+		memset(visited, false, sizeof(visited));
+		solve(0, 0, !is_hori);
+		
 		cout << "Number of legal solutions: " << ans << endl;
 	}
+	
 	return 0;
 }
-
