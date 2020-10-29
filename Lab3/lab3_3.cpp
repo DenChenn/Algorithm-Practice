@@ -1,49 +1,69 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-int R;
+int R = 0;
+bool hp[10001];
 
 class Graph{
 public:
     int num;
     list<int> *adj;
     bool *need;
-    Graph(int num){
-        num = num;
-        adj = new list<int>[num];
-        need = new bool[num];
-        fill_n(this->need, num, false);
+    vector<int> path;
 
+    Graph(int num){
+        this->num = num;
+        this->adj = new list<int>[num]; 
+        this->need = new bool[num];
+        fill_n(need, this->num, false);
     }
+
     void add(int v, int w){
         adj[v].push_back(w);
     }
 
+    bool check(vector<int>& a, int tar){
+        bool f = false;
+        for(auto b : a){
+            if(b == tar){
+                f = true;
+                break;
+            }
+        }
+        return f;
+    }
+
+//bfs
     bool solve(int eq){
-        for(int i = 0;i < num;i++){
-            
-            if(!need[i]){
-                dfs(i, eq);
-            }
-        }
-    }
+        queue<int> bfs;
+        bfs.push(eq);
+        path.push_back(eq);
 
-    bool dfs(int i, int eq){
-        list<int>::iterator j; 
-        for(j = adj[i].begin();j != adj[i].end();++j){
-            if(*j == eq){
-                return true;
-            }
-            
-            if(adj[*j].size() == 0)
+        while(!bfs.empty()){
+            int temp = bfs.front();
+            bfs.pop();
+            //cout << "temp= " << temp << endl;
+
+            if(path.size() > R*R)
                 return false;
+            
 
-            if(dfs(*j, eq)){
-                cout << *j << " ";
+            if(adj[temp].empty()){
+                //cout << "inin" << endl;
+                path.push_back(temp);
+                continue;
+            }
+
+            list<int>::iterator j;
+            for(j = adj[temp].begin();j != adj[temp].end();j++){
+                //cout << "j= " << *j << endl;
+                bfs.push(*j);
+                path.push_back(*j);  
             }
         }
+        return true;
     }
-}
+};
 
 int main () {
     int t, K, N;
@@ -52,12 +72,25 @@ int main () {
     while(t--){
         cin >> R >> K >> N;
         Graph g(R);
+        fill_n(hp, 10001, false);
         for(int i = 0;i < K;i++){
             cin >> room >> key;
-            g.add(room, key);
-            g.need[key] = true;
+            g.add(key, room);
         }
-        g.solve(N);
+        if(g.solve(N)){
+            vector<int>::iterator i;
+            //輸出處理
+            for(i = g.path.end()-1;i >= g.path.begin();i--){
+                if(!hp[*i] && *i != N){
+                    cout << *i << " ";
+                    hp[*i] = true;
+                }
+            }
+            cout << N << endl;
+        }
+        else
+            cout << "Lion can not pass this chapter!" << endl;
+        
     }
     return 0;
 }
