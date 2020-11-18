@@ -1,13 +1,13 @@
 #include <bits/stdc++.h>
-#define N 10001
+#define N 100001
 #define inf 5000000001
-#define cost first
+#define need first
 #define idx second
 using namespace std;
 using Edge = pair<int, int>;
-int open[100001];
-int close[100001];
-int take[100001];
+int open[N];
+int close[N];
+int take[N];
 vector<Edge> adj[N];
 long long dist[N];
 int nj, nr;
@@ -24,7 +24,7 @@ void spfa(int s){
     dist[s] = 0;
     vector<bool> vis(nj+1, false); //從一開始所以要多一
     priority_queue<Edge, vector<Edge>, greater<Edge>> pq;
-    pq.emplace(open[s]+close[s], s);
+    pq.emplace(0, s);
     int need = 0; // 到下一個點所需要的時間
 
     while(!pq.empty()){
@@ -45,7 +45,7 @@ void spfa(int s){
             if(dist[v.idx] > dist[u] + need){
                 now[v.idx] = now[u] + need;
                 dist[v.idx] = dist[u] + need;
-                pq.emplace(open[v.idx]+close[v.idx], v.idx);
+                pq.emplace(need, v.idx);
             }
         }
     }
