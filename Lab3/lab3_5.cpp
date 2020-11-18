@@ -1,99 +1,91 @@
 #include <bits/stdc++.h>
 using namespace std;
+#define N 10001
 
-bool nop[10001];
-int DFN[10001];
-int low[10001];
-int dindex = 0;
-int instack[10001];
+vector<int> edge[N];
+int dfn[N];
+int low[N];
+int component[N]; //將點縮成一個ＳＣＣ id, 可以視為是一個新的圖
+int indegree[N];
+bool instack[N];
 stack<int> st;
-int visited[10001];
+int T, C;
 
-class Graph{
-public:
-    int num;
-    list<int>* adj;
-    Graph(int n){
-        num = n;
-        adj = new list<int>[n+1];
-        for(int i = 0;i < n;i++)
-            adj[i].clear();
+void init(int num){
+    for(int i = 1;i <= num;i++){
+        instack[i] = false;
+        edge[i].clear();
+        dfn[i] = 0;
     }
 
-    void add(int u, int v){
-        adj[u].push_back(v);
-    }
-};
+    while(st.size())
+        st.pop();
 
-void tarjan(int i, Graph& g){
-    DFN[i] = ++dindex;
-    low[i] = ++dindex;
-    instack[i] = true;
-    st.push(i);
+    T = 0;
+    C = 0;
+}
 
-    list<int>::iterator k;
-    if(!g.adj[i].empty()){
-    for(k = g.adj[i].begin();k != g.adj[i].end();k++){
-        if(!DFN[*k]){
-            tarjan(*k, g);
-            low[i] = min(low[i], low[*k]);
+void tarjan(int u){
+    dfn[u] = low[u] = ++T;
+    st.push(u);
+    instack[u] = true;
+
+    for(int i = 0;i < edge[u].size();i++){
+        int v = edge[u][i];
+        if(!dfn[v]){
+            tarjan(v);
+            low[u] = min(low[u], low[v]);
         }
-        else if(instack[*k])
-            low[i] = min(low[i], DFN[*k]);           
+        else if(instack[v])
+            low[u] = min(low[u], dfn[v]);
     }
-    }
-    if(DFN[i] == low[i]){
-        int now;
-        while(true){
-            now = st.top();
+
+    if(dfn[u] == low[u]){
+        int ele;
+        C++;
+        indegree[C] = 0; //初始化一組強聯通元件的入度為0
+
+        do{
+            ele = st.top();
             st.pop();
-            if(now == i)
-                break;
-            //cout << now << " ";
-        }
-        //cout << endl;
-    }
-}
-
-void scc(int num, Graph& g){
-    fill_n(DFN, 10001, 0);
-    fill_n(instack, 10001, false);
-    bool allcon = true;
-    int ans = 0;
-
-    for(int i = 1;i < num;i++){
-        if(!DFN[i]){
-            allcon = false;
-            tarjan(i, g);
-            ans++;
-        }
-    }
-}
-
-void restruct(int num, Graph& g){
-    list<int>::iterator j;
-    for(int i = 0;i < num;i++){
-        for(j = g.adj[i].begin();j != g.adj[i].end();j++){
-            *j = low[*j];
-        }
+            instack[ele] = false;
+            component[ele] = C;
+        }while(ele!= u);
     }
 }
 
 int main () {
     int t, num, rel;
+    int from, dst;
     cin >> t;
     while(t--){
         cin >> num >> rel;
-        fill_n(nop, 10001, true);
-        int from, dst;
-        Graph g(num);
+        init(num);
         for(int i = 0;i < rel;i++){
             cin >> from >> dst;
-            g.add(from, dst);
-            nop[dst] = false;
+            edge[from].push_back(dst);
         }
 
-        cout << solve(num, g) << endl;        
+        for(int u = 1;u <= num;u++){
+            if(!dfn[u])
+                tarjan(u);
+        }
+
+        //計算新的DAG的各個點的入度
+        for(int u = 1;u <= num;u++){
+            for(int i = 0;i < edge[u].size();i++){
+                int v = edge[u][i];
+                if(component[u] != component[v])
+                    indegree[component[v]]++;
+            }
+        }
+
+
+        int ans = 0;
+        for(int c = 1;c <= C;c++){
+            if(indegree[c] == 0)
+                ans++;
+        }
+        cout << ans << endl;
     }
-    return 0;
 }
