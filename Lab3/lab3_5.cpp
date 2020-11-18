@@ -7,7 +7,7 @@ int low[10001];
 int dindex = 0;
 int instack[10001];
 stack<int> st;
-int SCC[10001];
+int visited[10001];
 
 class Graph{
 public:
@@ -55,21 +55,12 @@ void tarjan(int i, Graph& g){
     }
 }
 
-int solve(int num, Graph& g){
+void scc(int num, Graph& g){
     fill_n(DFN, 10001, 0);
     fill_n(instack, 10001, false);
     bool allcon = true;
     int ans = 0;
 
-    for(int i = 1;i < num;i++){
-        if(nop[i] && !DFN[i]){
-            allcon = false;
-            tarjan(i, g);
-            ans++;
-        }
-    }
-
-    
     for(int i = 1;i < num;i++){
         if(!DFN[i]){
             allcon = false;
@@ -77,8 +68,15 @@ int solve(int num, Graph& g){
             ans++;
         }
     }
-    
-    return ans;
+}
+
+void restruct(int num, Graph& g){
+    list<int>::iterator j;
+    for(int i = 0;i < num;i++){
+        for(j = g.adj[i].begin();j != g.adj[i].end();j++){
+            *j = low[*j];
+        }
+    }
 }
 
 int main () {
