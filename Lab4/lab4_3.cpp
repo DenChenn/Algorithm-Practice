@@ -8,7 +8,7 @@ using Edge = pair<int, int>;
 int open[N];
 int close[N];
 int take[N];
-vector<Edge> adj[N];
+vector<Edge> adj[N];s
 long long dist[N];
 int nj, nr;
 long long now[N];
