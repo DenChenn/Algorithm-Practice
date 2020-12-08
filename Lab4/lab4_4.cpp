@@ -1,8 +1,8 @@
 #include <bits/stdc++.h>
 using namespace std;
+using Point = pair<int,int>;
 #define N 800
 #define M 1001
-int dis[N];
 int vx[N];
 int vy[N];
 bool edgeEx[N][N];
@@ -12,26 +12,53 @@ struct Edge{
     int to;
     int w;
 };
-
-bool operator < (Edge& a, Edge& b){
+bool Cmp (Edge& a, Edge& b){
     return a.w < b.w;
 }
+
+struct disSet{
+    int dis[N];
+    void init(){
+        for(int i = 0;i < N;++i)
+            dis[i] = i;
+    }
+
+    int find(int v){
+        if(dis[v] == v)
+            return v;
+        return dis[v] = find(dis[v]);
+    }
+
+    bool same(int a, int b){
+        return find(a) == find(b);
+    }
+
+    void un(int a, int b){
+        dis[find(a)] = find(b);
+    }
+};
+
 vector<Edge> E;
-vector<Edge> ans;
+vector<Point> ans;
+disSet D;
 
 void init(){
-    for(int i = 0;i < N;i++){
-        dis[i] = -1;
-    }
     memset(edgeEx, false, N*N);
     E.clear();
     ans.clear();
 }
 
-void Kruskal(){
+int Kruskal(){
+    sort(E.begin(), E.end(), Cmp);
+    int cnt = 0;
     for(auto e:E){
-        
+        if(!D.same(e.from, e.to)){
+            cnt++;
+            D.un(e.from, e.to);
+            ans.push_back(Point(e.from, e.to));
+        }
     }
+    return cnt;
 } 
 
 int main () {
@@ -41,7 +68,8 @@ int main () {
     cin >> t;
     while(t--){
         init();
-        int n, m, a, b, distance;
+        D.init();
+        int n, m, a, b, distance, cnt;
         cin >> n;
         for(int i = 1;i <= n;i++){  //start from building 1
             cin >> vx[i] >> vy[i];
@@ -50,8 +78,7 @@ int main () {
         for(int i = 0;i < m;i++){
             cin >> a >> b;
             edgeEx[a][b] = true;
-            dis[a] -= 1;
-            dis[b] = a;
+            D.un(a,b);
         }
         for(int i = 1;i <= n;i++){
             for(int j = i+1;j <= n;j++){
@@ -61,8 +88,14 @@ int main () {
                 E.push_back(Edge(i, j, distance));
             }
         }
-        sort(E.begin(), E.end());
-
-    }
+        
+        cnt = Kruskal();
+        cout << cnt << endl;
+        if(cnt != 0){
+            for(auto p:ans)
+                cout << p.first << " " << p.second << endl;
+        }
+}
+    return 0;
 }
 
