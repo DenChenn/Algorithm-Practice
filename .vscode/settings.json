@@ -85,6 +85,11 @@
         "unordered_set": "cpp",
         "utility": "cpp",
         "valarray": "cpp",
-        "vector": "cpp"
+        "vector": "cpp",
+        "*.tcc": "cpp",
+        "codecvt": "cpp",
+        "shared_mutex": "cpp",
+        "cuchar": "cpp",
+        "memory_resource": "cpp"
     }
 }
