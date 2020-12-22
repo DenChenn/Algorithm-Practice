@@ -1,8 +1,11 @@
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 1
 xyz
 abc
 =======
+=======
+>>>>>>> Stashed changes
 3
 4
 10 20
@@ -25,4 +28,7 @@ abc
 457 60
 650 359
 631 42
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
