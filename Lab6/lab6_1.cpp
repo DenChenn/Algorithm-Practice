@@ -1,114 +1,32 @@
 #include <bits/stdc++.h>
 using namespace std;
-int dp[500][500]; // 儲存每個小問題的答案，初始化為-1
-bool visited[500];
-string s1;
-vector<char> s;
+int dp[600][600]; // 儲存每個小問題的答案，初始化為-1
+string s;
 int L;
-int ans;
-int accu;
-char pre;
-vector<char> unused;
 
-void init() {
 
-    fill_n(visited, L, false);
-    for(int i = 0;i < L;i++){
-        visited[i] = false;
-        for(int j = 0;j < L;j++){
-            dp[i][j] = -1;
-        }
-    }
-}
-
-int LengthOfLPS(int i, int j){
-    //cout << "i: " << s[i] << " j: " << s[j] << endl;
-    if (i == j) return 1;
-    if (i > j) return 0;
-    if (dp[i][j] != -1) {
-        //cout << "-----11111" << " " << dp[i][j] << endl;
-        return dp[i][j];
-    }
- 
-    // 左右兩端字元相等，定能形成更長迴文，同時從兩端縮小問題範疇。
-    if (s[i] == s[j]){
-        cout << "inin1" << endl;
-        dp[i][j] = LengthOfLPS(i+1, j-1) + 2;
-        if(s[i] != pre){
-            ans++;
-            pre = s[i];
-        }
-        visited[i] = true; visited[j] = true;
-    }
-
-    // 刪除左端字元比較好 || 都一樣好
-    else if (LengthOfLPS(i+1, j) >= LengthOfLPS(i, j-1)){
-        //cout << "inin2" << endl;
-        dp[i][j] = LengthOfLPS(i+1, j);
-        pre = '0';
-    }
-
-    // 刪除右端字元比較好。
-    else {
-        //cout << "inin3" << endl;
-        dp[i][j] = LengthOfLPS(i, j-1);
-        pre = '0';
-    }
-
-    return dp[i][j];
-}
-
-void solve() {
-    int l;
-    //while(s.size() != 1){
-        for(auto a : s)
-            cout << a << " ";
-        cout << endl;
-        init();
-        pre = '0';
-        l = LengthOfLPS(0, L-1);
-        accu += l;
-        for(int i = 0;i < L;i++){
-            if(!visited[i])
-                unused.push_back(s[i]);
-        }
-        s.clear();
-        for(int i = 0;i < unused.size();i++)
-            s.push_back(unused[i]);
-        unused.clear();
-
-        for(auto a : s)
-            cout << a << " ";
-        cout << endl;
-        init();
-        pre = '0';
-        l = LengthOfLPS(0, L-1);
-        accu += l;
-        for(int i = 0;i < L;i++){
-            if(!visited[i])
-                unused.push_back(s[i]);
-        }
-        s.clear();
-        for(int i = 0;i < unused.size();i++)
-            s.push_back(unused[i]);
-        unused.clear();
-
-        for(auto a : s)
-            cout << a << " ";
-        cout << endl;
-        init();
-        pre = '0';
-        l = LengthOfLPS(0, L-1);
-        accu += l;
-        for(int i = 0;i < L;i++){
-            if(!visited[i])
-                unused.push_back(s[i]);
-        }
-        s.clear();
-        for(int i = 0;i < unused.size();i++)
-            s.push_back(unused[i]);
-        unused.clear();
-    //}
+int MinimumDeletion(int l, int r) {
+    if (l > r) 
+        return 0; 
+    if (l == r) 
+        return 1; 
+    if (dp[l][r] != -1) 
+        return dp[l][r]; 
+  
+    //從第一個開始考慮 如果那個是自己獨立刪掉的狀況
+    int res = 1 + MinimumDeletion(l + 1, r); 
+  
+    //或是跟其他一樣的一起刪掉 
+    for (int i = l + 1; i <= r; ++i) { 
+  
+        //找到一樣的並且刪掉中間的
+        if (s[l] == s[i]) 
+            //後面的部份有考慮到i 所以不用像上面一樣+1
+            res = min(res, MinimumDeletion(l + 1, i - 1) + MinimumDeletion(i, r)); 
+    } 
+  
+    // Memoize 
+    return dp[l][r] = res; 
 }
 
 int main () {
@@ -116,15 +34,10 @@ int main () {
     cin.tie(0);
     int t; cin >> t;  
     while(t--){
+        memset(dp, -1, sizeof(dp));
         cin >> L;
-        s.clear();
-        cin >> s1;
-        for(int i = 0;i < L;i++)
-            s.push_back(s1[i]);
-        init();
-        ans = 0; accu = 0; pre = '0';     
-        solve();
-        cout << ans << endl;
+        cin >> s;
+        cout << MinimumDeletion(0, L-1) << endl;
     }
     return 0;
 }
